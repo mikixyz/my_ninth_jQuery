@@ -14,85 +14,6 @@
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript">
 
-$(function() {
-  var $list = $(".lists"),
-      Array = [],
-      s = "",
-      j = undefined,
-      k = undefined,
-      l = undefined,
-      m = undefined,
-      d = 0,
-      t = true,
-      u = false;
-      
-  function a() {
-    for(var i=0; i<16; i++) {
-      var x = Math.floor(i/2);
-          y = Math.floor(Math.random()*16);
-
-      if(Array[y] == undefined) {
-        Array[y] = x
-      } else {
-        i--
-      }
-    }
-
-    for(var i=0; i<16; i++) {
-      s += "<li data-number="+Array[i]+">?</li>"
-    }
-    $list.append(s);
-
-    j=$list.find("li")
-  }
-
-  function b() {
-    j.on("click",function(){
-      
-      if($(this).text()!=="?"||!t){
-        return false
-      }
-      
-      k=$(this);
-      
-      var p=k.data("number");
-      
-      k.text(p);
-      
-      if(m==undefined){
-        m=p;
-        l=k;
-        u=true
-      }else{
-        if(m==p){
-          d++;
-          if(d==16/2){
-            alert("CLEAR!")
-          }
-          u=true
-        }else{
-          u=false
-        }
-        m=undefined
-      }if(!u){
-        t=false;
-        c()
-      }
-    })
-  }
-
-  function c(){
-    setTimeout(function(){
-      l.text("?");
-      k.text("?");
-      t=true},1000
-    )
-  }
-  
-  a();
-  b()
-
-});
 // 今回やるのは神経衰弱です。
 // 今までの課題と違い、ロジックっぽいロジックを書きます。JS書いてるんだなーって気持ちになります。
 // まずゲームの流れを説明します。
@@ -116,6 +37,75 @@ $(function() {
 // ちなみに setTimeout などを使うことで1秒後に〜するなどは実装出来ます。
 // クリックした要素は必ず変数に格納しましょう。こうすることで比較が非常に簡単です。
 // 以上になります。10個の中で一番難しい"らしい"のですが、頑張ってクリアしましょう！
+
+
+$(function(){
+  
+  var cardNum = [],
+      totalCard = 16;
+
+  for (var i = 0; i < totalCard/2; i++){
+    cardNum.push(i,i);
+  }
+  
+  cardNum
+    .sort(function(){
+        return Math.random() - Math.random();
+    })
+    .map(function(num){
+        return "<li class='unopened' data-num='" + num + "'>?</li>";
+    })
+    .forEach(function(element){
+        $(".lists").append(element);
+    });
+  
+  $('.lists li').click(function(){
+    var $openedCard = $(this);
+    open($openedCard);
+    setTimeout(function(){
+      compare($openedCard);
+    }, 1000);
+  });
+});
+
+function open($card){
+  $card.css('pointer-events','none')
+       .text($card.data('num'));
+}
+
+function close($card){
+  $card.css('pointer-events','')
+       .text('?');
+}
+
+function compare($card){
+  if($('.firstOpen').length == 0){
+
+    $card.addClass('firstOpen');
+
+  } else {
+    
+    var $firstCard = $('.firstOpen'),
+        $secondCard = $card,
+        firstNum = $firstCard.data('num'),
+        secondNum = $secondCard.data('num');
+    
+    $firstCard.removeClass('firstOpen');
+    
+    if(firstNum === secondNum){
+      $firstCard.removeClass('unopened');
+      $secondCard.removeClass('unopened');
+      
+      if($('.unopened').length ===0){
+        alert("CLEAR!");
+      }
+
+    } else {
+      close($firstCard);
+      close($secondCard);
+    } 
+  }
+}
 
 </script>
 </body>
