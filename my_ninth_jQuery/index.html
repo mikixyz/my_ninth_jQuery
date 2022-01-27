@@ -42,9 +42,12 @@
 $(function(){
   
   var cardNum = [],
-      totalCard = 16;
+      totalCard = 16,
+      firstCard = "",
+      secondCard = "",
+      isFirst = true;
 
-  for (var i = 0; i < totalCard/2; i++){
+  for (var i = 0; i < totalCard / 2; i++){
     cardNum.push(i,i);
   }
   
@@ -60,52 +63,34 @@ $(function(){
     });
   
   $('.lists li').click(function(){
-    var $openedCard = $(this);
-    open($openedCard);
-    setTimeout(function(){
-      compare($openedCard);
-    }, 1000);
+    var $openedCard = $(this).css("pointer-events", "none").text($(this).data("num"));
+
+    setTimeout (function () {
+
+      if (isFirst) {
+        firstCard = $openedCard;
+        isFirst = false;
+
+      } else {
+        secondCard = $openedCard;
+
+        if (firstCard.data("num") == secondCard.data("num")) {
+          $(firstCard).removeClass("unopened");
+          $(secondCard).removeClass("unopened");
+
+          if ($(".unopened").length == 0) {
+            alert("CLEAR!");
+          }
+
+        } else {
+          $(firstCard).css("pointer-events", "").text("?");
+          $(secondCard).css("pointer-events", "").text("?");
+        }
+        isFirst = true;
+      }
+    },1000);
   });
 });
-
-function open($card){
-  $card.css('pointer-events','none')
-       .text($card.data('num'));
-}
-
-function close($card){
-  $card.css('pointer-events','')
-       .text('?');
-}
-
-function compare($card){
-  if($('.firstOpen').length == 0){
-
-    $card.addClass('firstOpen');
-
-  } else {
-    
-    var $firstCard = $('.firstOpen'),
-        $secondCard = $card,
-        firstNum = $firstCard.data('num'),
-        secondNum = $secondCard.data('num');
-    
-    $firstCard.removeClass('firstOpen');
-    
-    if(firstNum === secondNum){
-      $firstCard.removeClass('unopened');
-      $secondCard.removeClass('unopened');
-      
-      if($('.unopened').length ===0){
-        alert("CLEAR!");
-      }
-
-    } else {
-      close($firstCard);
-      close($secondCard);
-    } 
-  }
-}
 
 </script>
 </body>
