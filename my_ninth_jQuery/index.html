@@ -43,9 +43,7 @@ $(function(){
   
   var cardNum = [],
       totalCard = 16,
-      firstCard = "",
-      secondCard = "",
-      isFirst = true;
+      openFlag = false;
 
   for (var i = 0; i < totalCard / 2; i++){
     cardNum.push(i,i);
@@ -61,35 +59,71 @@ $(function(){
     .forEach(function(element){
         $(".lists").append(element);
     });
-  
-  $('.lists li').click(function(){
-    var $openedCard = $(this).css("pointer-events", "none").text($(this).data("num"));
 
-    setTimeout (function () {
+  const openCard = (function(card) {
+    var firstCardText, secondCardText, firstClickedData, secondClickedData,
+        openFirst = true, 
+        openFlag = false, 
+        pair = 0; 
 
-      if (isFirst) {
-        firstCard = $openedCard;
-        isFirst = false;
+    return function toOpenCard(card) {
+      var $listsLi = $(card),
+      clickedData, clickedText;
 
-      } else {
-        secondCard = $openedCard;
+      if($listsLi.text() === '?') {
+        if (openFlag){
+          return;
+        } else {
+          openFlag = true;
+        }
+      }
 
-        if (firstCard.data("num") == secondCard.data("num")) {
-          $(firstCard).removeClass("unopened");
-          $(secondCard).removeClass("unopened");
+      if($listsLi.text() === '?') {
+        clickedData = $listsLi.data('num'); 
+        clickedText = $listsLi.text(clickedData); 
 
-          if ($(".unopened").length == 0) {
-            alert("CLEAR!");
+        if(openFirst) {
+          firstCardText = clickedText; 
+          firstClickedData = clickedData; 
+          openFirst = false;
+          openFlag = false;
+
+        } else {
+          secondCardText = clickedText;
+          secondClickedData = clickedData;
+
+          compareCard();
+
+          openFirst = true;
+        }
+      }
+
+      function compareCard() {
+        if(firstClickedData === secondClickedData) {
+          pair++;
+          openFlag = false;
+
+          if(pair === totalCard / 2) {
+            setTimeout(function(){
+              alert('CLEAR!');
+            }, 1000)
           }
 
         } else {
-          $(firstCard).css("pointer-events", "").text("?");
-          $(secondCard).css("pointer-events", "").text("?");
+          setTimeout(function(){
+            openFlag = false; 
+            firstCardText.text('?');
+            secondCardText.text('?');
+          }, 1000)
         }
-        isFirst = true;
       }
-    },1000);
+    };
+  })();
+
+  $('.lists').find('li').on('click', function() {
+    openCard(this);
   });
+ 
 });
 
 </script>
